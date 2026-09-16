@@ -21,6 +21,7 @@ const uint32_t timePerFrame =  1000000 / FRAMERATE;
 static float frameRate = 0;
 static uint32_t currentTime = 0, lastTime = 0, frameTime = 0;
 static bool endFrame = true;
+bool webAppStore = false;
 static bool debugMode = false;
 
 static uint32_t getFreeRam() { 
@@ -114,124 +115,146 @@ static void printDebugCpuRamLoad()
 
 void Game_Setup(void)
 {   
+    //webAppStore is set in Platform_Init
     Platform_Init("Waternet v1.0");
-    framecount = 0;
-    debugMode = false;
-    option = 0;
-    needRedraw = 0;
-    levelDoneBit = 0;
-    paused = 0;
-    difficulty = diffNormal;
-    selectedLevel = 1;
-    mainMenu = mmStartGame;
-    gameState = gsInitIntro;
-    titleStep = tsMainMenu;
-    gameMode = gmRotate;
-    initSaveState();
-    initSound();
-    initMusic();
-    setMusicOn(isMusicOnSaveState());
-    setSoundOn(isSoundOnSaveState());
-    preloadImages();
-    //with a 1 bpp buffer, the colours its set and clear bits are shown in. The skin is
-    //always black & white there
-    Platform_SetBufferColors(ColorWhite, ColorBlack);
-    setBlockTilesAsBackground();
-    trackLowestFreeRam();
-    currentTime = Platform_Micros();
-    lastTime = 0;
+    if(!webAppStore)
+    {
+        Platform_Log("Free Ram at boot game: %6" PRIu32 "\n", getFreeRam());
+        framecount = 0;
+        debugMode = false;
+        option = 0;
+        needRedraw = 0;
+        levelDoneBit = 0;
+        paused = 0;
+        difficulty = diffNormal;
+        selectedLevel = 1;
+        mainMenu = mmStartGame;
+        gameState = gsInitIntro;
+        titleStep = tsMainMenu;
+        gameMode = gmRotate;
+        initSaveState();
+        initSound();
+        initMusic();
+        setMusicOn(isMusicOnSaveState());
+        setSoundOn(isSoundOnSaveState());
+        preloadImages();
+        //with a 1 bpp buffer, the colours its set and clear bits are shown in. The skin is
+        //always black & white there
+        Platform_SetBufferColors(ColorWhite, ColorBlack);
+        setBlockTilesAsBackground();
+        trackLowestFreeRam();
+        currentTime = Platform_Micros();
+        lastTime = 0;
+    }
+    else
+    {
+        //webappstore stuff
+    }
 }
 
 void Game_Loop(void)
 {
-    currentTime = Platform_Micros();
-    frameTime  = currentTime - lastTime;
-#if FPSLOCK
-    if((frameTime < timePerFrame) || !endFrame)
-       return;
-#else
-    //no lock, a frame starts as soon as the last one is done
-    if(!endFrame)
-       return;
-#endif
-    endFrame = false;
-    //without the lock two frames can start within the same microsecond on a fast PC
-    frameRate = 1000000.0 / (frameTime ? frameTime : 1);
-    lastTime = currentTime;    
-    prevButtons = currButtons;
-    currButtons = Platform_GetButtons();
-    musicTimer();
-    if((currButtons & BUTTON_UP) && (currButtons & BUTTON_DOWN) && !(prevButtons & BUTTON_DOWN))
-        debugMode = !debugMode;
+    if(!webAppStore)
+    {        
+        currentTime = Platform_Micros();
+        frameTime  = currentTime - lastTime;
+    #if FPSLOCK
+        if((frameTime < timePerFrame) || !endFrame)
+           return;
+    #else
+        //no lock, a frame starts as soon as the last one is done
+        if(!endFrame)
+           return;
+    #endif
+        endFrame = false;
+        //without the lock two frames can start within the same microsecond on a fast PC
+        frameRate = 1000000.0 / (frameTime ? frameTime : 1);
+        lastTime = currentTime;    
+        prevButtons = currButtons;
+        currButtons = Platform_GetButtons();
+        musicTimer();
+        if((currButtons & BUTTON_UP) && (currButtons & BUTTON_DOWN) && !(prevButtons & BUTTON_DOWN))
+            debugMode = !debugMode;
 
-	    //gamestate handling   
-    switch (gameState)
-    {
-        case gsInitTitle:
-        case gsTitle:
-            titleScreen();
-            break;
-        case gsInitLevelSelect:
-        case gsLevelSelect:
-            levelSelect();
-            break;
-        case gsInitGame:
-        case gsGame:
-            game();
-            break;
-        case gsInitLevelsCleared:
-        case gsLevelsCleared:
-            levelsCleared();
-            break;
-        case gsInitHelpSlide:
-        case gsHelpSlide:
-            helpSlide();
-            break;
-        case gsInitHelpSlide2:
-        case gsHelpSlide2:
-            helpSlide2();
-            break;
-        case gsInitHelpSlide3:
-        case gsHelpSlide3:
-            helpSlide3();
-            break;
-        case gsHelpRotateSlide:
-        case gsInitHelpRotateSlide:
-            helpRotateSlide();
-            break;
-        case gsInitHelpRotateSlide2:
-        case gsHelpRotateSlide2:
-            helpRotateSlide2();
-            break;
-        case gsInitHelpRotateSlide3:
-        case gsHelpRotateSlide3:
-            helpRotateSlide3();
-            break;
-        case gsInitHelpRotateSlide4:
-        case gsHelpRotateSlide4:
-            helpRotateSlide4();
-            break;
-        case gsInitHelpRotate:
-        case gsHelpRotate:
-            helpRotate();
-            break;
-        case gsInitHelpRotate2:
-        case gsHelpRotate2:
-            helpRotate2();
-            break;
-        case gsInitHelpRotate3:
-        case gsHelpRotate3:
-            helpRotate3();
-            break;
-        case gsInitIntro:
-        case gsIntro:
-            intro();
-            break;
+    	    //gamestate handling   
+        switch (gameState)
+        {
+            case gsInitTitle:
+            case gsTitle:
+                titleScreen();
+                break;
+            case gsInitLevelSelect:
+            case gsLevelSelect:
+                levelSelect();
+                break;
+            case gsInitGame:
+            case gsGame:
+                game();
+                break;
+            case gsInitLevelsCleared:
+            case gsLevelsCleared:
+                levelsCleared();
+                break;
+            case gsInitHelpSlide:
+            case gsHelpSlide:
+                helpSlide();
+                break;
+            case gsInitHelpSlide2:
+            case gsHelpSlide2:
+                helpSlide2();
+                break;
+            case gsInitHelpSlide3:
+            case gsHelpSlide3:
+                helpSlide3();
+                break;
+            case gsHelpRotateSlide:
+            case gsInitHelpRotateSlide:
+                helpRotateSlide();
+                break;
+            case gsInitHelpRotateSlide2:
+            case gsHelpRotateSlide2:
+                helpRotateSlide2();
+                break;
+            case gsInitHelpRotateSlide3:
+            case gsHelpRotateSlide3:
+                helpRotateSlide3();
+                break;
+            case gsInitHelpRotateSlide4:
+            case gsHelpRotateSlide4:
+                helpRotateSlide4();
+                break;
+            case gsInitHelpRotate:
+            case gsHelpRotate:
+                helpRotate();
+                break;
+            case gsInitHelpRotate2:
+            case gsHelpRotate2:
+                helpRotate2();
+                break;
+            case gsInitHelpRotate3:
+            case gsHelpRotate3:
+                helpRotate3();
+                break;
+            case gsInitIntro:
+            case gsIntro:
+                intro();
+                break;
+        }
+
+        trackLowestFreeRam();
+        printDebugCpuRamLoad();
+        Platform_PresentFrame();
+    	framecount++;
+        endFrame = true;
     }
-
-    trackLowestFreeRam();
-    printDebugCpuRamLoad();
-    Platform_PresentFrame();
-	framecount++;
-    endFrame = true;
+    else
+    {
+        //webappstore stuff
+        static uint32_t prev = 0;
+        if(Platform_Micros() - prev > 1000000)
+        {
+            prev = Platform_Micros();
+            Platform_Log("Free Ram webappstore: %6" PRIu32 "\n", getFreeRam());
+        }
+    }
 }
