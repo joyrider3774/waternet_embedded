@@ -1,5 +1,5 @@
 # Builds every device's release file on a Linux runner and uploads them all as one artifact.
-#
+# 
 # The toolchains are pinned to the versions the game is developed against, so a build a year from now
 # is the same build. The Windows exe, the libretro dll and the Playdate simulator's pdex.dll are cross
 # compiled with mingw-w64 (tools/mingw-w64.cmake), so the Linux runner still produces the same files
