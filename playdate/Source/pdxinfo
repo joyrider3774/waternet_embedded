@@ -1,0 +1,6 @@
+name=Waternet
+author=Willems Davy aka Joyrider3774
+description=Connect the pipes so the water flows puzzle game
+bundleID=com.joyrider3774.waternet.embedded
+version=1.0
+buildNumber=1
