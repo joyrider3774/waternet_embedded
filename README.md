@@ -91,7 +91,7 @@ You need to connect all the pipes so water flows through them, by pressing the A
 | Dpad | Select menu's, options or levels to play, in random mode left or right creates a new level. During gameplay move the selector tile around. |
 | A | Confirm in menu and level selector, rotate or slide action while playing, continue to the next level when a level is solved |
 | B | Back in menu and level selector. During gameplay pause the game (A resumes, B quits to the level selector). Hold it when a level is solved to see the solved level |
-| Up + Down | Show or hide the debug info |
+| (A) + Left + Down | Show or hide the debug info |
 
 ## Credits
 The Game Concept is based on net and netslide games from the [simon tatham's puzzle collections](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/)

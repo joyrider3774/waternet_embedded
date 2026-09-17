@@ -9,6 +9,19 @@
 //the selector tiles are identical in every skin, only the default copy is included to save flash
 #include "images/default/selectortiles_RGB565_LE.h"
 
+//A row of an image on its way to the display. Where flash is plain memory an evenly placed
+//row is handed over where it lies, otherwise it is copied into the scratch row first. A 16
+//bit read needs an even address, a core like the Cortex-M0+ faults on an odd one
+static inline const uint16_t* ImageRow(const void* src, uint16_t* scratch, int count)
+{
+#if PLATFORM_DIRECT_FLASH
+    if (((uintptr_t)src & 1) == 0)
+        return (const uint16_t*)src;
+#endif
+    PLATFORM_READ_BYTES((uint8_t*)scratch, src, count * sizeof(uint16_t));
+    return scratch;
+}
+
 //only the skins FORCESKIN leaves in are part of the build (a 1 bpp buffer forces the black & white one)
 #if SKINBUILT(skinBlackWhite)
 #include "images/blackwhite/blocktiles_RGB565_LE.h"
@@ -36,6 +49,8 @@
 #include "images/sonic/congratsscreen_RLE565.h"
 #include "images/sonic/congratstiles_RGB565_LE.h"
 #include "images/sonic/titlescreen_RLE565.h"
+
+
 #endif
 
 
@@ -198,9 +213,9 @@ static void drawImage(int x, int y, int w, int h, const uint16_t* data, bool tra
         for (int r = r0; r < r1; r++)
         {
             //the visible part of the row in one copy out of flash
-            PLATFORM_READ_BYTES((uint8_t*)line, data + c0 + r * w, cols * sizeof(uint16_t));
+            const uint16_t* prow = ImageRow(data + c0 + r * w, line, cols);
             //true: the values are plain RGB565, the library puts them in display order
-            SCREEN.writePixels(line, cols, true);
+            SCREEN.writePixels(prow, cols, true);
         }
     }
     else
@@ -210,13 +225,13 @@ static void drawImage(int x, int y, int w, int h, const uint16_t* data, bool tra
         {
             //the visible part of the row in one copy out of flash. The runs are gathered at
             //the front of the same line, a run never gets ahead of the pixel being read
-            PLATFORM_READ_BYTES((uint8_t*)line, data + c0 + r * w, cols * sizeof(uint16_t));
+            const uint16_t* prow = ImageRow(data + c0 + r * w, line, cols);
             int runX = 0, runLen = 0;
             for (int c = 0; c <= cols; c++)
             {
                 uint16_t color = TRANSPARENT_COLOR;
                 if (c < cols)
-                    color = line[c];
+                    color = prow[c];
                 //magenta is the transparent key, it (and the end of the row) closes a run
                 if (color != TRANSPARENT_COLOR)
                 {
