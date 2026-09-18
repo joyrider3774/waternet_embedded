@@ -122,7 +122,19 @@ Every [release](https://github.com/joyrider3774/waternet_embedded/releases) has 
 | MS-DOS | DOS_Waternet.zip | unzip WATERNET.EXE onto a DOS machine or into DOSBox and run it, the progress is saved next to it in WATERNET.SAV |
 | Browser | Web_Waternet.zip | upload it to an itch.io HTML project, or unzip it and open index.html from a web server, the progress is saved in the browser |
 
-`python tools/build_releases.py` builds all of them, `python tools/convert_skins.py` turns the images in `assets/skins` into the headers the game includes. The Playdate build also needs the Playdate SDK, see `platforms/playdate/CMakeLists.txt`, the libretro core libretro-common, see `platforms/libretro/CMakeLists.txt`, the Game Boy Advance build devkitARM and libgba, see `platforms/gba/CMakeLists.txt`, the Nintendo DS build devkitARM, libnds and calico, see `platforms/nds/CMakeLists.txt`, the Nintendo 3DS build devkitARM and libctru, see `platforms/3ds/CMakeLists.txt`, the PlayStation build PSn00bSDK, see `platforms/psx/CMakeLists.txt`, the Nintendo 64 build the mips64-elf toolchain and libdragon, see `platforms/n64/CMakeLists.txt`, the PSP build the pspdev toolchain, see `platforms/psp/CMakeLists.txt` (pspdev has no Windows build, so on Windows it is built from WSL), and the Vita build VitaSDK, see `platforms/vita/CMakeLists.txt`, the browser build Emscripten, see `platforms/web/CMakeLists.txt`, and the MS-DOS build DJGPP, see `platforms/dos/CMakeLists.txt`.
+`python tools/build_releases.py` builds all of them  
+`python tools/convert_skins.py` turns the images in `assets/skins` into the headers the game includes  
+The Playdate build also needs the Playdate SDK, see `platforms/playdate/CMakeLists.txt`  
+The libretro core needs libretro-common, see `platforms/libretro/CMakeLists.txt`  
+The Game Boy Advance build needs devkitARM and libgba, see `platforms/gba/CMakeLists.txt`  
+The Nintendo DS build needs devkitARM, libnds and calico, see `platforms/nds/CMakeLists.txt`  
+The Nintendo 3DS build needs devkitARM and libctru, see `platforms/3ds/CMakeLists.txt`  
+The PlayStation build needs PSn00bSDK, see `platforms/psx/CMakeLists.txt`  
+The Nintendo 64 build needs the mips64-elf toolchain and libdragon, see `platforms/n64/CMakeLists.txt`  
+The PSP build needs the pspdev toolchain, see `platforms/psp/CMakeLists.txt` (pspdev has no Windows build, so on Windows it is built from WSL)  
+The Vita build needs VitaSDK, see `platforms/vita/CMakeLists.txt`  
+The browser build needs Emscripten, see `platforms/web/CMakeLists.txt`  
+The MS-DOS build needs DJGPP, see `platforms/dos/CMakeLists.txt`
 
 ## Credits
 The Game Concept is based on net and netslide games from the [simon tatham's puzzle collections](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/)
