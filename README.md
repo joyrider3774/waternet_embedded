@@ -10,33 +10,39 @@ The browser build, at twice the game's own 128x128:
 | --- | --- |
 | ![Waternet title screen](metadata/screenshots/title.png) | ![Waternet in game](metadata/screenshots/ingame.png) |
 
-## Devices
-Every [release](https://github.com/joyrider3774/waternet_embedded/releases) has a build for every device. `releases/` is where a build of your own puts them, it is not part of the repository:
+## Game Features:
+- 3 Game modes (Rotate, Slide, RoSlid)
+- 5 Difficulties per game mode (very easy, easy, normal, hard, very hard)
+- 25 Levels per difficulty
+- Unlimited random levels mode, per game mode
+- 4 Skins to choose from (default, black & white, viaduct and sonic)
+- Help screens for every game mode
+- Music and sound can be switched on or off
+- Autosaves progress, options and the chosen skin
 
-| Device | File | How to install |
-| ------ | ---- | -------------- |
-| [ESPboy](https://www.espboy.com/) | ESPboy_Waternet.bin | flash it, the board is a LOLIN(WEMOS) D1 mini |
-| [Gamebuino META](https://gamebuino.com/gamebuino-meta) | GamebuinoMeta_Waternet.bin | copy it into a folder on the SD card, the .hex is for flashing it directly |
-| [Adafruit PyBadge](https://www.adafruit.com/product/4200) | PyBadge_Waternet.uf2 | double press reset and copy it onto the drive that appears |
-| [Adafruit PyGamer](https://www.adafruit.com/product/4242) | PyGamer_Waternet.uf2 | same as the PyBadge |
-| [Pimoroni PicoSystem](https://shop.pimoroni.com/products/picosystem) | PicoSystem_Waternet.uf2 | hold X while switching on and copy it onto the drive that appears |
-| [Pimoroni Explorer](https://shop.pimoroni.com/products/explorer?variant=42092697845843) | Explorer_Waternet.uf2 | hold BOOT while pressing RESET and copy it onto the drive that appears |
-| [Pimoroni Tufty 2350](https://shop.pimoroni.com/products/tufty-2350?variant=55811986227579) | Tufty_Waternet.uf2 | hold HOME while pressing RESET and copy it onto the drive that appears |
-| [TinyCircuits Thumby Color](https://tinycircuits.com/products/thumby-color) | ThumbyColor_Waternet.uf2 | put it into bootloader mode and copy it onto the RPI-RP2 drive that appears |
-| [Playdate](https://play.date/) | Playdate_Waternet.pdx.zip | unzip it and sideload Waternet.pdx, the same pdx runs in the Playdate simulator |
-| [Libretro / RetroArch](https://www.retroarch.com/) | Libretro_Waternet.zip | copy waternet_libretro.dll into RetroArch's cores folder and waternet_libretro.info into its info folder, then Load Core and Start Core |
-| [Game Boy Advance](https://en.wikipedia.org/wiki/Game_Boy_Advance) | GBA_Waternet.gba | put it on a flash cart or open it in an emulator, the progress is saved in the cartridge's SRAM |
-| [Nintendo DS](https://en.wikipedia.org/wiki/Nintendo_DS) | NDS_Waternet.nds | put it on a flash card or open it in an emulator, the progress is saved next to it in Waternet.sav |
-| [Nintendo 3DS](https://en.wikipedia.org/wiki/Nintendo_3DS) | 3DS_Waternet.3dsx | copy it into /3ds/ on the SD card and start it from the Homebrew Launcher, or open it in an emulator, the progress is saved in sdmc:/3ds/Waternet/ |
-| [Nintendo 64](https://en.wikipedia.org/wiki/Nintendo_64) | N64_Waternet.z64 | put it on a flash cart or open it in an emulator, the progress is saved in the cartridge EEPROM |
-| [PlayStation](https://en.wikipedia.org/wiki/PlayStation_(console)) | PSX_Waternet.exe | open it in an emulator or send it to a console that runs unsigned code, the progress is not saved yet |
-| [PlayStation Portable](https://en.wikipedia.org/wiki/PlayStation_Portable) | PSP_Waternet.PBP | rename it to EBOOT.PBP and put it in ms0:/PSP/GAME/Waternet/ on the memory stick, or open it in PPSSPP |
-| [PlayStation Vita](https://en.wikipedia.org/wiki/PlayStation_Vita) | Vita_Waternet.vpk | install it with VitaShell on a Vita with homebrew enabled, or open it in Vita3K |
-| Windows | Windows_Waternet.exe | runs on its own, the progress is saved next to it in Waternet.sav |
-| MS-DOS | DOS_Waternet.zip | unzip WATERNET.EXE onto a DOS machine or into DOSBox and run it, the progress is saved next to it in WATERNET.SAV |
-| Browser | Web_Waternet.zip | upload it to an itch.io HTML project, or unzip it and open index.html from a web server, the progress is saved in the browser |
+## Playing the Game:
+The aim of the game, in any game mode is always to connect all pipes so that water can flow through them from the water point source. How you can accomplish this depends on the game mode. The game has a help section in the main menu where you can always check up on the rules of each game mode. The game has 375 levels, spread over 3 game mode each with 5 difficulties, so thats 25 levels per difficulty / game mode. To top that off the game also provides a random difficulty which will generate never ending, random levels for the game mode you had chosen.
 
-`python tools/build_releases.py` builds all of them, `python tools/convert_skins.py` turns the images in `assets/skins` into the headers the game includes. The Playdate build also needs the Playdate SDK, see `platforms/playdate/CMakeLists.txt`, the libretro core libretro-common, see `platforms/libretro/CMakeLists.txt`, the Game Boy Advance build devkitARM and libgba, see `platforms/gba/CMakeLists.txt`, the Nintendo DS build devkitARM, libnds and calico, see `platforms/nds/CMakeLists.txt`, the Nintendo 3DS build devkitARM and libctru, see `platforms/3ds/CMakeLists.txt`, the PlayStation build PSn00bSDK, see `platforms/psx/CMakeLists.txt`, the Nintendo 64 build the mips64-elf toolchain and libdragon, see `platforms/n64/CMakeLists.txt`, the PSP build the pspdev toolchain, see `platforms/psp/CMakeLists.txt` (pspdev has no Windows build, so on Windows it is built from WSL), and the Vita build VitaSDK, see `platforms/vita/CMakeLists.txt`, the browser build Emscripten, see `platforms/web/CMakeLists.txt`, and the MS-DOS build DJGPP, see `platforms/dos/CMakeLists.txt`.
+## Game Modes
+The Game has 3 game modes
+
+### Rotate Mode
+You need to connect all the pipes so water flows through them, by pressing the A button on a pipe, to rotate the single pipe.
+
+### Slide Mode
+You need to connect all the pipes so water flows through them, by pressing the A  button on the arrows of a row or column. The row or column will move all pipes in the direction the arrow is pointing at.
+
+### Roslid Mode
+You need to connect all the pipes so water flows through them, by pressing the A button on the arrows of a row or column. The row or column will move all pipes in the direction the arrow is pointing at. You can also press the A button on a pipe, to rotate the single pipe. This is a combination Rotate and Slide mode.
+
+## Controls
+
+| Button | Action |
+| ------ | ------ |
+| Dpad | Select menu's, options or levels to play, in random mode left or right creates a new level. During gameplay move the selector tile around. |
+| A | Confirm in menu and level selector, rotate or slide action while playing, continue to the next level when a level is solved |
+| B | Back in menu and level selector. During gameplay pause the game (A resumes, B quits to the level selector). Hold it when a level is solved to see the solved level |
+| (A) + Left + Down | Show or hide the debug info |
 
 ### Buttons
 The game's buttons on every device:
@@ -90,39 +96,33 @@ On the PlayStation Vita the game is blown up four times to 512x512 in the middle
 
 On the Gamebuino META holding HOME for a second goes back to its loader.
 
-## Game Features:
-- 3 Game modes (Rotate, Slide, RoSlid)
-- 5 Difficulties per game mode (very easy, easy, normal, hard, very hard)
-- 25 Levels per difficulty
-- Unlimited random levels mode, per game mode
-- 4 Skins to choose from (default, black & white, viaduct and sonic)
-- Help screens for every game mode
-- Music and sound can be switched on or off
-- Autosaves progress, options and the chosen skin
+## Devices
+Every [release](https://github.com/joyrider3774/waternet_embedded/releases) has a build for every device. `releases/` is where a build of your own puts them, it is not part of the repository:
 
-## Playing the Game:
-The aim of the game, in any game mode is always to connect all pipes so that water can flow through them from the water point source. How you can accomplish this depends on the game mode. The game has a help section in the main menu where you can always check up on the rules of each game mode. The game has 375 levels, spread over 3 game mode each with 5 difficulties, so thats 25 levels per difficulty / game mode. To top that off the game also provides a random difficulty which will generate never ending, random levels for the game mode you had chosen.
+| Device | File | How to install |
+| ------ | ---- | -------------- |
+| [ESPboy](https://www.espboy.com/) | ESPboy_Waternet.bin | flash it, the board is a LOLIN(WEMOS) D1 mini |
+| [Gamebuino META](https://gamebuino.com/gamebuino-meta) | GamebuinoMeta_Waternet.bin | copy it into a folder on the SD card, the .hex is for flashing it directly |
+| [Adafruit PyBadge](https://www.adafruit.com/product/4200) | PyBadge_Waternet.uf2 | double press reset and copy it onto the drive that appears |
+| [Adafruit PyGamer](https://www.adafruit.com/product/4242) | PyGamer_Waternet.uf2 | same as the PyBadge |
+| [Pimoroni PicoSystem](https://shop.pimoroni.com/products/picosystem) | PicoSystem_Waternet.uf2 | hold X while switching on and copy it onto the drive that appears |
+| [Pimoroni Explorer](https://shop.pimoroni.com/products/explorer?variant=42092697845843) | Explorer_Waternet.uf2 | hold BOOT while pressing RESET and copy it onto the drive that appears |
+| [Pimoroni Tufty 2350](https://shop.pimoroni.com/products/tufty-2350?variant=55811986227579) | Tufty_Waternet.uf2 | hold HOME while pressing RESET and copy it onto the drive that appears |
+| [TinyCircuits Thumby Color](https://tinycircuits.com/products/thumby-color) | ThumbyColor_Waternet.uf2 | put it into bootloader mode and copy it onto the RPI-RP2 drive that appears |
+| [Playdate](https://play.date/) | Playdate_Waternet.pdx.zip | unzip it and sideload Waternet.pdx, the same pdx runs in the Playdate simulator |
+| [Libretro / RetroArch](https://www.retroarch.com/) | Libretro_Waternet.zip | copy waternet_libretro.dll into RetroArch's cores folder and waternet_libretro.info into its info folder, then Load Core and Start Core |
+| [Game Boy Advance](https://en.wikipedia.org/wiki/Game_Boy_Advance) | GBA_Waternet.gba | put it on a flash cart or open it in an emulator, the progress is saved in the cartridge's SRAM |
+| [Nintendo DS](https://en.wikipedia.org/wiki/Nintendo_DS) | NDS_Waternet.nds | put it on a flash card or open it in an emulator, the progress is saved next to it in Waternet.sav |
+| [Nintendo 3DS](https://en.wikipedia.org/wiki/Nintendo_3DS) | 3DS_Waternet.3dsx | copy it into /3ds/ on the SD card and start it from the Homebrew Launcher, or open it in an emulator, the progress is saved in sdmc:/3ds/Waternet/ |
+| [Nintendo 64](https://en.wikipedia.org/wiki/Nintendo_64) | N64_Waternet.z64 | put it on a flash cart or open it in an emulator, the progress is saved in the cartridge EEPROM |
+| [PlayStation](https://en.wikipedia.org/wiki/PlayStation_(console)) | PSX_Waternet.exe | open it in an emulator or send it to a console that runs unsigned code, the progress is not saved yet |
+| [PlayStation Portable](https://en.wikipedia.org/wiki/PlayStation_Portable) | PSP_Waternet.PBP | rename it to EBOOT.PBP and put it in ms0:/PSP/GAME/Waternet/ on the memory stick, or open it in PPSSPP |
+| [PlayStation Vita](https://en.wikipedia.org/wiki/PlayStation_Vita) | Vita_Waternet.vpk | install it with VitaShell on a Vita with homebrew enabled, or open it in Vita3K |
+| Windows | Windows_Waternet.exe | runs on its own, the progress is saved next to it in Waternet.sav |
+| MS-DOS | DOS_Waternet.zip | unzip WATERNET.EXE onto a DOS machine or into DOSBox and run it, the progress is saved next to it in WATERNET.SAV |
+| Browser | Web_Waternet.zip | upload it to an itch.io HTML project, or unzip it and open index.html from a web server, the progress is saved in the browser |
 
-## Game Modes
-The Game has 3 game modes
-
-### Rotate Mode
-You need to connect all the pipes so water flows through them, by pressing the A button on a pipe, to rotate the single pipe.
-
-### Slide Mode
-You need to connect all the pipes so water flows through them, by pressing the A  button on the arrows of a row or column. The row or column will move all pipes in the direction the arrow is pointing at.
-
-### Roslid Mode
-You need to connect all the pipes so water flows through them, by pressing the A button on the arrows of a row or column. The row or column will move all pipes in the direction the arrow is pointing at. You can also press the A button on a pipe, to rotate the single pipe. This is a combination Rotate and Slide mode.
-
-## Controls
-
-| Button | Action |
-| ------ | ------ |
-| Dpad | Select menu's, options or levels to play, in random mode left or right creates a new level. During gameplay move the selector tile around. |
-| A | Confirm in menu and level selector, rotate or slide action while playing, continue to the next level when a level is solved |
-| B | Back in menu and level selector. During gameplay pause the game (A resumes, B quits to the level selector). Hold it when a level is solved to see the solved level |
-| (A) + Left + Down | Show or hide the debug info |
+`python tools/build_releases.py` builds all of them, `python tools/convert_skins.py` turns the images in `assets/skins` into the headers the game includes. The Playdate build also needs the Playdate SDK, see `platforms/playdate/CMakeLists.txt`, the libretro core libretro-common, see `platforms/libretro/CMakeLists.txt`, the Game Boy Advance build devkitARM and libgba, see `platforms/gba/CMakeLists.txt`, the Nintendo DS build devkitARM, libnds and calico, see `platforms/nds/CMakeLists.txt`, the Nintendo 3DS build devkitARM and libctru, see `platforms/3ds/CMakeLists.txt`, the PlayStation build PSn00bSDK, see `platforms/psx/CMakeLists.txt`, the Nintendo 64 build the mips64-elf toolchain and libdragon, see `platforms/n64/CMakeLists.txt`, the PSP build the pspdev toolchain, see `platforms/psp/CMakeLists.txt` (pspdev has no Windows build, so on Windows it is built from WSL), and the Vita build VitaSDK, see `platforms/vita/CMakeLists.txt`, the browser build Emscripten, see `platforms/web/CMakeLists.txt`, and the MS-DOS build DJGPP, see `platforms/dos/CMakeLists.txt`.
 
 ## Credits
 The Game Concept is based on net and netslide games from the [simon tatham's puzzle collections](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/)
