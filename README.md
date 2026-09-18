@@ -3,6 +3,13 @@
 
 Waternet is a multiplatform puzzle game written for old consoles and handhelds like Game Boy (Color), Game Gear, Master System, Analogue Pocket and Mega Duck. This version runs on the small handhelds listed below and on Windows.
 
+## Screenshots
+The browser build, at twice the game's own 128x128:
+
+| Title screen | In game |
+| --- | --- |
+| ![Waternet title screen](metadata/screenshots/title.png) | ![Waternet in game](metadata/screenshots/ingame.png) |
+
 ## Devices
 Every [release](https://github.com/joyrider3774/waternet_embedded/releases) has a build for every device. `releases/` is where a build of your own puts them, it is not part of the repository:
 
