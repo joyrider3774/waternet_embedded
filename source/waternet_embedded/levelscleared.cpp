@@ -24,23 +24,23 @@ void levelsCleared(void)
     
     if (difficulty == diffVeryEasy)
     {
-        printCongratsScreen(0, 3, "VERY EASY LEVELS");
+        printCongratsScreen(0, 2, "VERY EASY LEVELS");
     }
     if (difficulty == diffEasy)
     {
-        printCongratsScreen(3, 3, "EASY LEVELS");
+        printCongratsScreen(3, 2, "EASY LEVELS");
     }
     if (difficulty == diffNormal)
     {
-        printCongratsScreen(2, 3, "NORMAL LEVELS");
+        printCongratsScreen(2, 2, "NORMAL LEVELS");
     }
     if (difficulty == diffHard)
     {
-        printCongratsScreen(3, 3, "HARD LEVELS");
+        printCongratsScreen(3, 2, "HARD LEVELS");
     }
     if (difficulty == diffVeryHard)
     {
-        printCongratsScreen(0, 3, "VERY HARD LEVELS");
+        printCongratsScreen(0, 2, "VERY HARD LEVELS");
     }
 
 
