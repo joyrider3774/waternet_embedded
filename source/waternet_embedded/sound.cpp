@@ -152,11 +152,12 @@ void SelectMusic(uint8_t musicFile)
                 musicArray = music_levelsCleared;
                 music_length = sizeof(music_levelsCleared) / sizeof(music_levelsCleared[0]);
                 break;
-            }
-            music_note = 0;
-            music_tempo = 0;
-            music_sustain_zero_set = 1;
-            music_sustain_note = 0;
+        }
+        music_note = 0;
+        music_tempo = 0;
+        music_sustain_zero_set = 1;
+        music_sustain_note = 0;
+        Platform_StopTone();
     }
     selecting_music = 0;
 }
