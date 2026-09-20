@@ -9,7 +9,7 @@
 void inithelpLegend(void) 
 {
     setBlockTilesAsBackground();
-    SelectMusic(musTitle);
+    SelectMusic(musNoMusic);
     needRedraw = 1;
 }
 
@@ -69,7 +69,7 @@ void helpLegend(int nextState)
 void initHelpFinishLevel(void) 
 {
     setBlockTilesAsBackground();
-    SelectMusic(musTitle);
+    SelectMusic(musNoMusic);
     needRedraw = 1;
 }
 
@@ -147,7 +147,7 @@ void helpFinishLevel(int nextState)
 void initHelpDoSlideRotate(void)
 {
     setBlockTilesAsBackground();
-    SelectMusic(musTitle);
+    SelectMusic(musNoMusic);
 
     //DRAW CURSOR SPRITES
     initCursors();

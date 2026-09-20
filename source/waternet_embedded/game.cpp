@@ -78,7 +78,7 @@ void updateBackgroundGame(void)
 
 void initGame(void)
 {
-    SelectMusic(musGame);
+    SelectMusic(musNoMusic);
     //set background tiles
     setBlockTilesAsBackground();
     //set sprite for selector / cursor
@@ -104,7 +104,7 @@ void doUnPause(void)
 {
     paused = 0;
     //music could have been disabled by menu options during pause screen so we use the savestate value
-    setMusicOn(isMusicOnSaveState());
+    setMusicOn(isSoundOnSaveState());
     setSoundOn(isSoundOnSaveState());
     setCursorPos(0, boardX + selectionX, boardY + selectionY);
     showCursors();
@@ -305,7 +305,7 @@ void game(void)
                 levelDoneBit = 0;
                 //could have been enabled / disabled using menu's so need to replay as it's blocked from renabling
                 //during pause leveldonebit = 1
-                setMusicOn(isMusicOnSaveState());
+                setMusicOn(isSoundOnSaveState());
                 setSoundOn(isSoundOnSaveState());
                 //goto next level
                 if (difficulty == diffRandom)
@@ -313,7 +313,7 @@ void game(void)
                     //ned new seed based on time
                     randomSeedGame = Platform_RandomSeed() + framecount;
                     initLevel(randomSeedGame);
-                    SelectMusic(musGame);
+                    SelectMusic(musNoMusic);
                     //show cursor again (it's actually to early but i'm not fixing that)
                     setCursorPos(0, boardX + selectionX, boardY + selectionY);
                     showCursors();
@@ -327,7 +327,7 @@ void game(void)
                         selectedLevel++;
                         unlockLevel(gameMode, difficulty, selectedLevel-1);
                         initLevel(randomSeedGame);
-                        SelectMusic(musGame);
+                        SelectMusic(musNoMusic);
                         //show cursor again (it's actually to early but i'm not fixing that)
                         setCursorPos(0, boardX + selectionX, boardY + selectionY);
                         showCursors();
@@ -366,6 +366,7 @@ void game(void)
                 {
                     //need to reanble early 
                     setSoundOn(isSoundOnSaveState());
+                    setMusicOn(isSoundOnSaveState());
                     hideCursors();
                     playMenuBackSound();
                     gameState = gsInitLevelSelect;

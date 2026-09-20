@@ -135,7 +135,7 @@ void Game_Setup(void)
         initSaveState();
         initSound();
         initMusic();
-        setMusicOn(isMusicOnSaveState());
+        setMusicOn(isSoundOnSaveState());
         setSoundOn(isSoundOnSaveState());
         preloadImages();
         //with a 1 bpp buffer, the colours its set and clear bits are shown in. The skin is

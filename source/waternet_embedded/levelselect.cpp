@@ -42,7 +42,7 @@ void updateBackgroundLevelSelect(void)
 void initLevelSelect(void)
 {
     setBlockTilesAsBackground();
-    SelectMusic(musTitle);
+    SelectMusic(musNoMusic);
     updateBackgroundLevelSelect();
     needRedraw = 1;
 }

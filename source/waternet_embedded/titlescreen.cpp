@@ -50,26 +50,17 @@ void updateBackgroundTitleScreen(void)
                 }
                 else
                 {
-                    if(isMusicOn())
-                    {
-                        printMessage(1, 4, "MUSIC ON", true);
-                    }
-                    else
-                    {
-                        printMessage(1, 4, "MUSIC OFF", true);
-                    }
-
                     if(isSoundOn())
                     {
-                        printMessage(1, 5, "SOUND ON", true);
+                        printMessage(1, 4, "SOUND ON", true);
                     }
                     else
                     {
-                        printMessage(1, 5, "SOUND OFF", true);
+                        printMessage(1, 4, "SOUND OFF", true);
                     }
                     
-                    printMessage(1,6, "SKIN", true);
-                    printNumber(7,6, currentSkin() + 1, 1, true);
+                    printMessage(1,5, "SKIN", true);
+                    printNumber(7,5, currentSkin() + 1, 1, true);
                 }
             }
         }
@@ -109,7 +100,7 @@ void updateBackgroundTitleScreen(void)
 void initTitleScreen(void)
 {   
     setBlockTilesAsBackground();
-    SelectMusic(musTitle);
+    SelectMusic(musNoMusic);
     updateBackgroundTitleScreen();
     needRedraw = 1;
 }
@@ -167,7 +158,7 @@ void doUp(void)
                 {
                     playMenuSelectSound();
                     needRedraw = 1;
-                    if (option > opMusic)
+                    if (option > opSound)
                     {
                         option--;
                     }
@@ -239,7 +230,7 @@ void doDown(void)
                     }
                     else
                     {
-                        option = opMusic;
+                        option = opSound;
                     }
                 }
             }
@@ -296,17 +287,11 @@ void titleScreen(void)
             {
                 switch(option)
                 {
-                    case opMusic:
-					{
-                        setMusicOn(!isMusicOn());
-                        setMusicOnSaveState(isMusicOn());                       
-                        needRedraw = 1;
-                        break;
-					}
                     case opSound:
 					{
-                        setSoundOn(!isSoundOn());;
+                        setSoundOn(!isSoundOn());
                         setSoundOnSaveState(isSoundOn());
+                        setMusicOn(isSoundOn());
                         needRedraw = 1;
                         break;
 					}

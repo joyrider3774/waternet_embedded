@@ -97,167 +97,6 @@ const uint16_t PLATFORM_PROGMEM music_won[] ={
   NOTE_REST, pause2,
 };
 
-//https://onlinesequencer.net/2485064
-const uint16_t PLATFORM_PROGMEM music_game[] ={ 
-    NOTE_REST, pause3,
-    NOTE_C4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_REST, pause3,
-    NOTE_C4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4, pause3,
-    NOTE_E4, pause3,
-    NOTE_F4, pause3,
-    NOTE_REST, pause3,
-
-    NOTE_C4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_REST, pause3,
-    NOTE_C4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_CS4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4, pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4, pause3,
-    NOTE_E4, pause3,
-    NOTE_F4, pause3,
-    NOTE_REST, pause3,
-
-    NOTE_D4, pause3,
-    NOTE_C4, pause3,
-    NOTE_E4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST,  pause3,
-    NOTE_E4, pause3,
-    NOTE_REST,  pause3,
-    NOTE_E4, pause3,
-    NOTE_D4, pause3,
-    NOTE_REST,  pause3,
-    NOTE_DS4, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4, pause3,
-    NOTE_REST, pause3,
-    NOTE_E4, pause3,
-    NOTE_DS4, pause3,
-    NOTE_D4, pause3,
-    NOTE_C4, pause3,
-    NOTE_DS4, pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_REST,pause3,
-    NOTE_DS4,pause3,
-    NOTE_D4,pause3,
-    NOTE_C4,pause3,
-    NOTE_REST,pause3,
-    NOTE_D4,pause3,
-    NOTE_C4,pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_REST,pause3,
-    NOTE_E4,pause3,
-    NOTE_REST,pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_REST,pause3,
-    NOTE_DS4,pause3,
-    NOTE_DS4,pause3,
-    NOTE_E4,pause3,
-    NOTE_REST,pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_C4,pause3,
-    NOTE_CS4,pause3,
-    NOTE_DS4,pause3,
-    NOTE_F4,pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_DS4,pause3,
-    NOTE_DS4,pause3,
-    NOTE_REST, pause3,
-    NOTE_E4,pause3,
-    NOTE_D4,pause3,
-    NOTE_D4,pause3,
-    NOTE_REST, pause3,
-    NOTE_DS4,pause3,
-    NOTE_CS4,pause3,
-    NOTE_CS4,pause3,
-    NOTE_REST, pause3,
-    NOTE_D4,pause3,
-};
-
-//https://onlinesequencer.net/2484977
-const uint16_t PLATFORM_PROGMEM music_intro[] = {
-    NOTE_C4,  pause1,
-    NOTE_C4,  pause1 * 2,
-    NOTE_D4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_REST, pause1 * 8,
-    
-    NOTE_C4,  pause1,
-    NOTE_C4,  pause1 * 2,
-    NOTE_D4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_D4,  pause1,
-    NOTE_C4,  pause1,
-    NOTE_CS4, pause1,
-    NOTE_REST, pause1 * 4,
-
-    NOTE_C4,  pause1,
-    NOTE_C4,  pause1 * 2,
-    NOTE_D4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_REST, pause1 * 8,
-    
-    NOTE_C4,  pause1,
-    NOTE_C4,  pause1 * 2,
-    NOTE_D4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_D4,  pause1,
-    NOTE_C4,  pause1,
-    NOTE_CS4, pause1,
-    NOTE_REST, pause1 * 4,
-
-    NOTE_D4,  pause1,
-    NOTE_D4,  pause1, 
-    NOTE_CS4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_CS4, pause1,
-    NOTE_D4,  pause1,
-    NOTE_DS4, pause1,
-    NOTE_CS4, pause1,
-    NOTE_DS4, pause1,
-    NOTE_D4,  pause1,
-    NOTE_D4,  pause1,
-    NOTE_D4,  pause1,
-    NOTE_E4, pause1,
-    NOTE_C4,  pause1,
-    NOTE_CS4, pause1,
-    NOTE_E4,  pause1,
-    NOTE_D4,  pause1 * 3,
-    NOTE_REST, pause1 * 4,
-};
 
 void setMusicOn(uint8_t value)
 {
@@ -266,16 +105,6 @@ void setMusicOn(uint8_t value)
     {
         if (prev_music != 0)
             SelectMusic(prev_music);
-        else
-        {
-            //this can only happen on title screen
-            //normally this does not belong here
-            //but if music was off in storage no music was playing
-            //before and you can only enable it in the main - options - menu
-            //where title music plays
-            if (gameState == gsTitle)
-                SelectMusic(musTitle);
-        }
     }
     else
     {
@@ -315,11 +144,6 @@ void SelectMusic(uint8_t musicFile)
         music_loop = 0;
         switch (musicFile)
         {
-            case musTitle:
-                musicArray = music_intro;
-                music_length = sizeof(music_intro) / sizeof(music_intro[0]);
-                music_loop = 1;
-                break;
             case musLevelClear:
                 musicArray = music_won;
                 music_length = sizeof(music_won) / sizeof(music_won[0]);
@@ -327,11 +151,6 @@ void SelectMusic(uint8_t musicFile)
             case musAllLevelsClear:
                 musicArray = music_levelsCleared;
                 music_length = sizeof(music_levelsCleared) / sizeof(music_levelsCleared[0]);
-                break;
-            case musGame:
-                musicArray = music_game;
-                music_length = sizeof(music_game) / sizeof(music_game[0]);
-                music_loop = 1;
                 break;
             }
             music_note = 0;
@@ -406,7 +225,7 @@ void musicTimer()
 
 void initMusic()
 {
-    music_on = isMusicOnSaveState();
+    music_on = isSoundOnSaveState();
     music_sustain_note = 0;
     prev_music = 0;
     music_note = 0;

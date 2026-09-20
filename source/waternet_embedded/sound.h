@@ -3,10 +3,9 @@
 
 #include <stdint.h>
 
-constexpr uint8_t musGame = 1;
-constexpr uint8_t musTitle = 2;
-constexpr uint8_t musLevelClear = 3;
-constexpr uint8_t musAllLevelsClear = 4;
+constexpr uint8_t musLevelClear = 1;
+constexpr uint8_t musAllLevelsClear = 2;
+constexpr uint8_t musNoMusic = 3;
 
 constexpr uint8_t sfxSustain = 16;
 

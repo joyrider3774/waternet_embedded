@@ -72,10 +72,9 @@
 #define mmCredits 3
 #define mmCount 4
 
-#define opMusic 0
-#define opSound 1
-#define opSkins 2
-#define opCount 3
+#define opSound 0
+#define opSkins 1
+#define opCount 2
 
 #define tsMainMenu 0
 #define tsGameMode 1
