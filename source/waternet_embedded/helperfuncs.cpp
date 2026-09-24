@@ -165,7 +165,7 @@ static void drawImageToBuffer(int x, int y, int w, int h, const uint16_t* data, 
             uint16_t color = row[c];
             //RGB332, the same conversion SetBufferPixel does
             if (!transparent || (color != TRANSPARENT_COLOR))
-                d[c] = (uint8_t)(((color & 0xE000) >> 8) | ((color & 0x0700) >> 6) | ((color & 0x0018) >> 3));
+                d[c] = ToBuffer332(color, (int16_t)(dx + c), (int16_t)dy);
         }
   #else
         for (int c = 0; c < cols; c++)
