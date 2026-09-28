@@ -13,6 +13,9 @@ import sys
 from PIL import Image
 
 SKIN_PREFIX = {"default": "default", "sonic": "sonic", "blackwhite": "black_white", "viaduct": "viaduct"}
+#The pictures png2rle565.py stores run length encoded, its FULLSCREEN_IMAGES. They are not
+#stored raw as well, or the folder fills with headers nothing includes
+RLE_IMAGES = {"titlescreen", "congratsscreen"}
 
 
 def to_rgb565(path):
@@ -50,7 +53,8 @@ def main():
     for skin, prefix in SKIN_PREFIX.items():
         os.makedirs(os.path.join(images_dir, skin), exist_ok=True)
         for png in sorted(os.listdir(os.path.join(skins_dir, skin))):
-            if not png.endswith(".png"):
+            #see RLE_IMAGES: the run length converter owns those
+            if not png.endswith(".png") or png[:-4] in RLE_IMAGES:
                 continue
             name = png[:-4].replace("-", "_")
             width, height, pixels = to_rgb565(os.path.join(skins_dir, skin, png))
