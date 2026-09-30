@@ -4,7 +4,12 @@
 #include "commonvars.h"
 
 
-constexpr int storageStart = 493;
+//Where the save state begins in the platform's block. This was 493, which was what the
+//original game happened to leave in front of it; nothing reads those bytes, and starting at
+//the front means the whole of what is saved is fourteen bytes, which fits devices that keep
+//their block in a single flash page. Saves written by an older build no longer read, which
+//validateSaveState() treats as nothing having been saved
+constexpr int storageStart = 0;
 constexpr uint8_t soundOptionBit = 0U;
 constexpr uint8_t musicOptionBit = 1U; 
 

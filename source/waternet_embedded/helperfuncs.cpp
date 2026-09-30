@@ -1,13 +1,20 @@
 #include <stdint.h>
 #include "commonvars.h"
 #include "helperfuncs.h"
+//the one bit pictures of the black & white skin
+#include "onebitimage.h"
 #include "savestate.h"
 
 //magenta, the colour the images use for transparent pixels, in RGB565
 #define TRANSPARENT_COLOR 0xF81F
 
-//the selector tiles are identical in every skin, only the default copy is included to save flash
+//The selector tiles are the same picture in every skin, so only one copy of them is included. The
+//black & white skin keeps its own all the same: its copy is packed one bit a pixel and comes to
+//10672 bytes, where the default skin's is 61440 of RGB565, and a build that has only the black &
+//white skin in it has no other use for those
+#if FORCESKIN != skinBlackWhite
 #include "images/default/selectortiles_RGB565_LE.h"
+#endif
 
 //A row of an image on its way to the display. Where flash is plain memory an evenly placed
 //row is handed over where it lies, otherwise it is copied into the scratch row first. A 16
@@ -25,6 +32,7 @@ static inline const uint16_t* ImageRow(const void* src, uint16_t* scratch, int c
 //only the skins FORCESKIN leaves in are part of the build (a 1 bpp buffer forces the black & white one)
 #if SKINBUILT(skinBlackWhite)
 #include "images/blackwhite/blocktiles_RGB565_LE.h"
+#include "images/blackwhite/selectortiles_RGB565_LE.h"
 #include "images/blackwhite/congratsscreen_RLE565.h"
 #include "images/blackwhite/congratstiles_RGB565_LE.h"
 #include "images/blackwhite/titlescreen_RLE565.h"
@@ -55,6 +63,16 @@ static inline const uint16_t* ImageRow(const void* src, uint16_t* scratch, int c
 
 
 const uint8_t* currentTiles;
+//Where the sheet in use keeps its eight row tiles, and the first tile it holds. The block tiles are
+//128 twelve row tiles followed by 128 of eight rows, so they start at tile 0 and their small half
+//begins after the big one. The congratulations screen's sheet holds only the letters it prints, as
+//eight row tiles, so it starts at tile 64 and has no twelve row half at all
+int currentFirstTile = 0;
+int currentSmallRow = BLOCKTILES_SMALL_ROW;
+//1 while the skin in use keeps its pictures one bit a pixel, which only the black & white
+//one does. The selector tiles are the default skin's whatever skin is running, so they are
+//always RGB565 and are drawn as such, see drawTile
+bool skinImagesOneBit = false;
 
 //the skin in use: the one FORCESKIN builds in (a 1 bpp buffer forces the black & white one), or
 //the one picked in the options
@@ -69,6 +87,7 @@ uint8_t currentSkin(void)
 
 void preloadImages(void)
 {
+    skinImagesOneBit = ONEBITIMAGES && (currentSkin() == skinBlackWhite);
     switch(currentSkin())
     {
 #if SKINBUILT(0)
@@ -90,7 +109,10 @@ void preloadImages(void)
             ColorWhite = SCREEN.color565(255,255,255);
 	        ColorBlack = SCREEN.color565(0,0,0);
             blockTiles = black_white_blocktiles_data;
-            selectorTiles = default_selectortiles_data;
+            //its own selector tiles rather than the default skin's. Sharing them saved flash while
+            //every skin was RGB565, but this skin's are one bit a pixel and come to 10672 bytes
+            //against the 61440 of the default skin's, so borrowing them now costs 50 KB
+            selectorTiles = black_white_selectortiles_data;
             congratsScreenTiles = black_white_congratstiles_data;
             imgTitleScreen = black_white_titlescreen_rle;
             imgCongratsScreen = black_white_congratsscreen_rle;
@@ -261,24 +283,47 @@ static void drawImage(int x, int y, int w, int h, const uint16_t* data, bool tra
 #endif
 }
 
+//Draws the w x h tile that starts at row `row` of a tile sheet. A sheet is one picture as wide as
+//a tile, so a tile is the rows from `row` on, and this takes that row rather than a pointer into
+//the middle of the data: a sheet packed one bit a pixel cannot be indexed by the byte the way an
+//RGB565 one can.
+//
+//Every sheet in use belongs to the skin that is running, so which of the two kinds it is follows
+//from the skin. Every skin can be in the build here and picked in the options, so that is a
+//question for run time and not for the build, see skinImagesOneBit
+void drawTile(int x, int y, int w, int h, const uint8_t* sheet, int row, bool transparent)
+{
+    if (!sheet)
+        return;
+#if ONEBITIMAGES
+    if (skinImagesOneBit)
+    {
+        drawImageOneBitPart(x, y, 0, row, w, h, sheet, transparent);
+        return;
+    }
+#endif
+    //the sheet is tileSize wide, so the tile's pixels lie together from its first row on
+    drawImage(x, y, w, h, (const uint16_t*)(sheet + (size_t)row * tileSize * sizeof(uint16_t)), transparent);
+}
+
 void set_bkg_tile_xy(int ax, int ay, int tile)
 {
-    drawImage(BIG_X_OFFSET + ax* tileSize, BIG_Y_OFFSET + ay* tileSize, tileSize, tileSize, (const uint16_t*)(currentTiles + tile * tileSize * tileSize * sizeof(uint16_t)), false);
+    drawTile(BIG_X_OFFSET + ax * tileSize, BIG_Y_OFFSET + ay * tileSize, tileSize, tileSize,
+             currentTiles, (tile - currentFirstTile) * tileSize, false);
 }
 
 void set_bkg_tile_xy8x8(int ax, int ay, int tile)
 {
-    pushImageTransparent(ax* 8 + SMALL_X_OFFSET, 8 + ay*SMALL_Y_OFFSET, tileSize, 8, (const uint16_t*)(currentTiles + (tile + 192) * tileSize * 8 * sizeof(uint16_t)));
+    //the eight row tiles of this sheet, wherever it keeps them
+    drawTile(ax * 8 + SMALL_X_OFFSET, 8 + ay * SMALL_Y_OFFSET, tileSize, 8,
+             currentTiles, currentSmallRow + (tile - currentFirstTile) * 8, true);
 }
 
-void pushImageTransparent(int x, int y, int w, int h, const uint16_t* data)
-{
-    drawImage(x, y, w, h, data, true);
-}
-
-void set_bkg_data(const uint8_t* tiles)
+void set_bkg_data(const uint8_t* tiles, int firstTile, int smallRow)
 {
     currentTiles = tiles;
+    currentFirstTile = firstTile;
+    currentSmallRow = smallRow;
 }
 
 //Draws a run length encoded RGB565 image made by tools/png2rle565.py, clipped to the screen:
@@ -290,6 +335,14 @@ static void pushImageRLE(int x, int y, int w, int h, const uint8_t* data)
 {
     if (!data || (w <= 0) || (h <= 0))
         return;
+#if ONEBITIMAGES
+    if (skinImagesOneBit)
+    {
+        //the picture carries its own size and is drawn whole
+        drawImageOneBitPart(x, y, 0, 0, w, h, data, false);
+        return;
+    }
+#endif
     //the columns and rows of the image that are on screen
     const int c0 = (x < 0) ? -x : 0;
     const int c1 = (x + w > WINDOW_WIDTH) ? WINDOW_WIDTH - x : w;

@@ -8,6 +8,16 @@
 #define CURSORANIMCOUNT 4
 #define NUMTILES 32
 
+//The selector sheet holds only the tiles that are drawn, 8 to 40, the twelve row ones first and
+//then the eight row ones, see tools/png2rgb565.py and the sheets in assets/skins. It used to run
+//to 128 of each with tile 0 first, which left nine tenths of it empty and carried artwork in tiles
+//0 to 6 that nothing ever drew
+#define SELECTOR_FIRST_TILE 8
+#define SELECTOR_LAST_TILE 40
+#define SELECTOR_TILE_COUNT (SELECTOR_LAST_TILE - SELECTOR_FIRST_TILE + 1)
+//where the eight row tiles start, the twelve row ones coming before them
+#define SELECTOR_SMALL_ROW (SELECTOR_TILE_COUNT * tileSize)
+
 int cursorFrameCount = 0, cursorFrame = 0;
 int spriteTiles[NUMTILES];
 int showCursor = 1;
@@ -32,10 +42,13 @@ void drawCursors(bool drawBig)
     {
         if (spritePos[i][1] < WINDOW_HEIGHT)
         {
+            //A tile is named by the row it starts on rather than by a pointer into the sheet, see
+            //drawTile: a sheet packed one bit a pixel cannot be indexed by the byte
+            const int tile = spriteTiles[i] - SELECTOR_FIRST_TILE;
             if(drawBig)
-                pushImageTransparent(spritePos[i][0]+BIG_X_OFFSET, spritePos[i][1]+BIG_Y_OFFSET, tileSize, tileSize, (const uint16_t*)(selectorTiles + spriteTiles[i] * tileSize * tileSize * sizeof(uint16_t)));
+                drawTile(spritePos[i][0]+BIG_X_OFFSET, spritePos[i][1]+BIG_Y_OFFSET, tileSize, tileSize, selectorTiles, tile * tileSize, true);
             else
-                pushImageTransparent(spritePos[i][0]/tileSize*8 + SMALL_X_OFFSET, spritePos[i][1]/tileSize*8+ SMALL_Y_OFFSET, tileSize, 8, (const uint16_t*)(selectorTiles + (spriteTiles[i] + 192) * tileSize * 8 * sizeof(uint16_t)));
+                drawTile(spritePos[i][0]/tileSize*8 + SMALL_X_OFFSET, spritePos[i][1]/tileSize*8+ SMALL_Y_OFFSET, tileSize, 8, selectorTiles, SELECTOR_SMALL_ROW + tile * 8, true);
         }
     }
 }

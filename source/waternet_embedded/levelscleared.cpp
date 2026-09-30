@@ -8,7 +8,9 @@
 
 void initLevelsCleared(void)
 {
-    set_bkg_data(congratsScreenTiles);
+    //this sheet is only the letters the screen prints, tiles 64 to 90, and only as eight
+//row tiles: it has no twelve row half and starts at tile 64
+    set_bkg_data(congratsScreenTiles, 64, 0);
     GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
     set_bkg_tiles(0, 0, congratsScreenWidth, congratsScreenHeight, imgCongratsScreen);
     SelectMusic(musAllLevelsClear);    

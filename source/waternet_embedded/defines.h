@@ -115,6 +115,19 @@
 //1 when the images of skin n are part of the build
 #define SKINBUILT(n) ((FORCESKIN < 0) || (FORCESKIN == (n)))
 
+//1 when the black & white skin is in the build, whose pictures are packed one bit a pixel by
+//tools/onebit.py and drawn by the routines in onebitimage.cpp rather than as RGB565. It shows two
+//colours, and keeping each of them in sixteen bits costs both flash and the work of writing a
+//colour per pixel. Every skin can be in the build here and picked in the options, so which of the
+//two a picture is in cannot be known at build time: what is drawn says so, see drawTile
+#define ONEBITIMAGES SKINBUILT(skinBlackWhite)
+
+//1 when the black & white skin is the only one in the build. Every picture is then one bit a pixel
+//and the paths that read RGB565 are dead: a build that is only ever going to draw one bit pictures
+//need not carry the index the run length encoded background is read through, which is a row table
+//the width of the screen
+#define ONEBITONLY (ONEBITIMAGES && (FORCESKIN == skinBlackWhite))
+
 #define FRAMERATE 15
 //1 = every frame waits until 1/FRAMERATE of a second has passed, 0 = a frame starts as soon
 //as the last one is done, to see how fast the game can go. Movement, animation, input
