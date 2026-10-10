@@ -15,10 +15,11 @@
 #define CARD_FILE_83 "WATERNETDAT"
 
 //every skin and picture name, hashed: a card made by another build has another stamp
-#define CARD_STAMP 0x72AF4B44UL
+#define CARD_STAMP 0xFA72F858UL
 
 //the sections of the container, by the name its table holds. Levels will be another one
 #define CARD_SEC_IMAGES "IMGS"
+#define CARD_SEC_LEVELS "LVLS"
 
 //1 when any picture is kept as one colour a row, see FMT_ROWS. The game builds the
 //code that draws one only then: a card without any is a game that need not carry it
@@ -48,3 +49,7 @@ enum CardImage : uint8_t
 	CARD_IMG_SELECTORTILES = 3,
 	CARD_IMG_TITLESCREEN = 4,
 };
+
+//1 when the card holds the level packs too, so the game reads them from there and not
+//out of flash. 0 leaves everything about the levels as it was
+#define CARD_HAS_LEVELS 0
