@@ -28,6 +28,18 @@
 //menu. START held for 3 seconds calls it, see Platform_GetButtons
 #define PLATFORM_HAS_EXIT 1
 
+//This device reads its art from the card rather than carrying it in flash: every skin in full
+//RGB565, including the two this game has that no device could ever show, instead of the one
+//reduced skin that fits. See CARDIMAGES in defines.h and the card file tools/mkcard.py writes.
+//Set here and not only by the build, so the Arduino IDE builds the same thing; -DCARDIMAGES=0
+//builds the old flash version. It has to be settled before SCREENBUFFER below, which depends on it
+#ifndef CARDIMAGES
+#define CARDIMAGES 1
+#endif
+#if CARDIMAGES
+#define PLATFORM_HAS_CARD 1
+#endif
+
 //Where drawing goes, the modes are described in PlatformESPboy.h. 20464 bytes of RAM leave room
 //for 0 (straight to the display) or a 1 bpp buffer, which is 2048 bytes. An 8 bpp buffer would be
 //16384 of the 20464 and leave nothing for the stack, the heap and the SD card, so it is not
@@ -41,8 +53,18 @@
 //for every pixel, which is why drawImageOneBitPart is marked PLATFORM_HOT_CODE: from flash that
 //same frame took about 200 ms and the game ran at 5 frames a second.
 //A 1 bpp buffer also picks the black & white skin by itself, see FORCESKIN in defines.h
+//A card build cannot use the 1 bpp buffer: it holds two colours, so the RGB565 art read from the
+//card would be thresholded to black and white on the way into it and the card would buy nothing.
+//It draws straight to the panel instead, and the band renderer takes the buffer's place - a strip
+//at a time is put together in ram and sent whole, so a repaint is still never seen happening.
+//That also gives the 2048 bytes of the buffer and the 4096 of its expansion table back, which a
+//card build wants for the arena its art is kept in
 #ifndef SCREENBUFFER
+#if CARDIMAGES
+#define SCREENBUFFER 0
+#else
 #define SCREENBUFFER 1
+#endif
 #endif
 #if (SCREENBUFFER != 0) && (SCREENBUFFER != 1)
 #error "the CHGame has the RAM for SCREENBUFFER 0 or 1, an 8 bpp buffer would be 16 KB of its 20 KB"
@@ -52,7 +74,9 @@
 //FORCESKIN in defines.h. The black & white skin is the one that is taken: its pictures are
 //packed one bit a pixel rather than kept as RGB565, which is what makes the game fit at all.
 //A 1 bpp buffer picks that skin itself, and a build can still ask for another one
-#if !defined(FORCESKIN) && (SCREENBUFFER != 1)
+//A card build names no skin: every one of them is on the card and the game's own options pick
+//one while it runs, see CardImages_UseSkin and skinSaveState
+#if !defined(FORCESKIN) && (SCREENBUFFER != 1) && !CARDIMAGES
 #define FORCESKIN skinBlackWhite
 #endif
 

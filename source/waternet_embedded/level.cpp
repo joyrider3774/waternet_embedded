@@ -6,6 +6,8 @@
 #include "level.h"
 #include "commonvars.h"
 #include "helperfuncs.h"
+//the board is painted a strip at a time where there is no screen buffer
+#include "bandrender.h"
 
 int generating = 0;
 
@@ -34,7 +36,36 @@ int generating = 0;
 //     prevBoardHeight = height;
 // }
 
+//Draws the whole board. Only draws: it reads the game's state and changes none of it, which is
+//what lets the band renderer call it once per strip
+static void drawLevelOnce(void);
+
 void drawLevel(void)
+{
+    //Already inside a pass: the strip that is open is what gets drawn into, and the screen that
+    //opened it sends it. A pass of our own here would take over the one strip buffer and the one
+    //set of strip bounds and lose the pass around it, so the board joins that one instead
+    if (BandRender_Drawing())
+    {
+        drawLevelOnce();
+        return;
+    }
+    //A strip at a time, each one put together in ram and sent whole, so the board is never seen
+    //filling itself in. That is what the 1 bpp buffer did for a flash build, which a card build
+    //cannot use because it holds two colours; see bandrender.h and PlatformCHGame.h
+    //Only the board. The whole screen would take the text under it with it: drawLevel paints the
+    //board and nothing else, so anything outside it would be left as the plain backdrop
+    if (BandRender_Begin(BIG_X_OFFSET, BIG_Y_OFFSET,
+                         maxBoardBgWidth * tileSize, maxBoardBgHeight * tileSize, ColorBlack))
+    {
+        while (BandRender_Next())
+            drawLevelOnce();
+        return;
+    }
+    drawLevelOnce();
+}
+
+static void drawLevelOnce(void)
 {
     //background
     for (int x = 0; x != maxBoardBgWidth; x++)

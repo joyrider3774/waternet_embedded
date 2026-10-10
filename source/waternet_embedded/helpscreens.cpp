@@ -4,6 +4,8 @@
 #include "printfuncs.h"
 #include "cursor.h"
 #include "sound.h"
+//the screen is painted a strip at a time where there is no buffer
+#include "bandrender.h"
 
 //LEGEND STATE
 void inithelpLegend(void) 
@@ -14,17 +16,11 @@ void inithelpLegend(void)
 }
 
 //LEGEND STATE
-void helpLegend(int nextState)
+//only draws, so the band renderer can call it once per strip
+static void drawHelpLegendOnce(void)
 {
-    if (gameState >= gsInitDiff)
-    {
-        inithelpLegend();
-        gameState -= gsInitDiff;
-    }
-    
-    if (needRedraw)
-    {
-        needRedraw = 0;
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
         GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
         if (gameState == gsHelpSlide)
             printMessage(2, 0, "HELP: SLIDE");
@@ -57,6 +53,29 @@ void helpLegend(int nextState)
             printMessage(1, 7, ":SLID COL UP");
         }
     }
+
+void helpLegend(int nextState)
+{
+    if (gameState >= gsInitDiff)
+    {
+        inithelpLegend();
+        gameState -= gsInitDiff;
+    }
+    
+    if (needRedraw)
+    {
+        needRedraw = 0;
+#if SCREENBUFFER == 0
+        //a strip at a time, so the screen is not seen being painted
+        if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+        {
+            while (BandRender_Next())
+                drawHelpLegendOnce();
+        }
+        else
+#endif
+            drawHelpLegendOnce();
+    }
     
     if ((currButtons & BUTTON_A) && (!(prevButtons & BUTTON_A)))
     {
@@ -74,17 +93,11 @@ void initHelpFinishLevel(void)
 }
 
 //FINISH LEVEL STATE
-void helpFinishLevel(int nextState)
+//only draws, so the band renderer can call it once per strip
+static void drawHelpFinishLevelOnce(void)
 {
-    if (gameState >= gsInitDiff)
-    {
-        initHelpFinishLevel();
-        gameState -= gsInitDiff;
-    }
-
-    if (needRedraw)
-    {
-        needRedraw = 0;
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
         GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
         if (gameState == gsHelpSlide2)
             printMessage(2, 0, "HELP: SLIDE");
@@ -137,6 +150,29 @@ void helpFinishLevel(int nextState)
         printMessage(7, 6, "FILLED");
     }
 
+void helpFinishLevel(int nextState)
+{
+    if (gameState >= gsInitDiff)
+    {
+        initHelpFinishLevel();
+        gameState -= gsInitDiff;
+    }
+
+    if (needRedraw)
+    {
+        needRedraw = 0;
+#if SCREENBUFFER == 0
+        //a strip at a time, so the screen is not seen being painted
+        if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+        {
+            while (BandRender_Next())
+                drawHelpFinishLevelOnce();
+        }
+        else
+#endif
+            drawHelpFinishLevelOnce();
+    }
+
     if ((currButtons & BUTTON_A) && (!(prevButtons & BUTTON_A)))
     {
         playMenuAcknowlege();
@@ -168,18 +204,11 @@ void initHelpDoSlideRotate(void)
     needRedraw = 1;
 }
 
-void helpDoSlideRotate(int nextState)
+//only draws, so the band renderer can call it once per strip
+static void drawHelpDoSlideRotateOnce(void)
 {
-    if (gameState >= gsInitDiff)
-    {
-        initHelpDoSlideRotate();
-        gameState -= gsInitDiff;
-    }
-
-    needRedraw |= updateCursorFrame();
-    if (needRedraw)
-    {
-        needRedraw = 0;
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
         GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
 
         if (gameState == gsHelpSlide3)
@@ -304,6 +333,30 @@ void helpDoSlideRotate(int nextState)
         set_bkg_tile_xy8x8(14, 6, 23);
 
         drawCursors();
+    }
+
+void helpDoSlideRotate(int nextState)
+{
+    if (gameState >= gsInitDiff)
+    {
+        initHelpDoSlideRotate();
+        gameState -= gsInitDiff;
+    }
+
+    needRedraw |= updateCursorFrame();
+    if (needRedraw)
+    {
+        needRedraw = 0;
+#if SCREENBUFFER == 0
+        //a strip at a time, so the screen is not seen being painted
+        if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+        {
+            while (BandRender_Next())
+                drawHelpDoSlideRotateOnce();
+        }
+        else
+#endif
+            drawHelpDoSlideRotateOnce();
     }
 
     if ((currButtons & BUTTON_A) && (!(prevButtons & BUTTON_A)))

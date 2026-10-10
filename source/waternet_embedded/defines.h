@@ -5,6 +5,28 @@
 //PlatformESPboy.h / PlatformSDL.h
 #include "PlatformDevice.h"
 
+//1 = the art is read from a card while the game runs and none of it is in flash, see
+//cardimages.h. It needs a device that can read one (PLATFORM_HAS_CARD in Platform.h) and the card
+//file tools/mkcard.py writes. Every skin is then on the card in full RGB565 and the game can be
+//asked for any of them, which is what flash could never hold: the whole reason only one reduced
+//skin is built in is the 50944 bytes a device has for everything
+#ifndef CARDIMAGES
+#define CARDIMAGES 0
+#endif
+
+//How much RAM a card build keeps its art in. A picture small enough to be worth it is read once
+//and kept here, so drawing it again is a copy; a full screen one is read a row or a strip at a
+//time and never kept. A screen whose pictures do not all fit still draws correctly, it just reads
+//them again, which CardImages_Reads() counts. See the arena in cardimages.cpp
+//5120 and not the usual 3072: the block sheet alone is 4480 bytes and it is drawn 169 times a
+//board, so it has to stay in here, and 5120 is the next size up that holds it with the cursor
+//(128 bytes) and a little else beside it. Larger only takes RAM the board's blocks need: the
+//heap holds 169 of them and the game drew a part of a board when it ran short
+#ifndef CARDARENA
+#define CARDARENA 3072
+#endif
+
+
 //the ESPboy display
 #define WINDOW_WIDTH 128
 #define WINDOW_HEIGHT 128
@@ -112,6 +134,9 @@
   #define FORCESKIN -1
   #endif
 #endif
+//magenta, the colour the images use for transparent pixels, in RGB565
+#define TRANSPARENT_COLOR 0xF81F
+
 //1 when the images of skin n are part of the build
 #define SKINBUILT(n) ((FORCESKIN < 0) || (FORCESKIN == (n)))
 

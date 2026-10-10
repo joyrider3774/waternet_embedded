@@ -4,15 +4,17 @@
 //the one bit pictures of the black & white skin
 #include "onebitimage.h"
 #include "savestate.h"
+//the art read from a card, and the strips it is drawn into
+#include "cardimages.h"
+#include "bandrender.h"
 
-//magenta, the colour the images use for transparent pixels, in RGB565
-#define TRANSPARENT_COLOR 0xF81F
+//TRANSPARENT_COLOR is in defines.h, the band renderer leaves those pixels out as well
 
 //The selector tiles are the same picture in every skin, so only one copy of them is included. The
 //black & white skin keeps its own all the same: its copy is packed one bit a pixel and comes to
 //10672 bytes, where the default skin's is 61440 of RGB565, and a build that has only the black &
 //white skin in it has no other use for those
-#if FORCESKIN != skinBlackWhite
+#if !CARDIMAGES && (FORCESKIN != skinBlackWhite)
 #include "images/default/selectortiles_RGB565_LE.h"
 #endif
 
@@ -30,7 +32,7 @@ static inline const uint16_t* ImageRow(const void* src, uint16_t* scratch, int c
 }
 
 //only the skins FORCESKIN leaves in are part of the build (a 1 bpp buffer forces the black & white one)
-#if SKINBUILT(skinBlackWhite)
+#if !CARDIMAGES && SKINBUILT(skinBlackWhite)
 #include "images/blackwhite/blocktiles_RGB565_LE.h"
 #include "images/blackwhite/selectortiles_RGB565_LE.h"
 #include "images/blackwhite/congratsscreen_RLE565.h"
@@ -38,21 +40,21 @@ static inline const uint16_t* ImageRow(const void* src, uint16_t* scratch, int c
 #include "images/blackwhite/titlescreen_RLE565.h"
 #endif
 
-#if SKINBUILT(0)
+#if !CARDIMAGES && SKINBUILT(0)
 #include "images/default/blocktiles_RGB565_LE.h"
 #include "images/default/congratsscreen_RLE565.h"
 #include "images/default/congratstiles_RGB565_LE.h"
 #include "images/default/titlescreen_RLE565.h"
 #endif
 
-#if SKINBUILT(2)
+#if !CARDIMAGES && SKINBUILT(2)
 #include "images/viaduct/blocktiles_RGB565_LE.h"
 #include "images/viaduct/congratsscreen_RLE565.h"
 #include "images/viaduct/congratstiles_RGB565_LE.h"
 #include "images/viaduct/titlescreen_RLE565.h"
 #endif
 
-#if SKINBUILT(3)
+#if !CARDIMAGES && SKINBUILT(3)
 #include "images/sonic/blocktiles_RGB565_LE.h"
 #include "images/sonic/congratsscreen_RLE565.h"
 #include "images/sonic/congratstiles_RGB565_LE.h"
@@ -78,7 +80,10 @@ bool skinImagesOneBit = false;
 //the one picked in the options
 uint8_t currentSkin(void)
 {
-#if FORCESKIN >= 0
+#if CARDIMAGES
+    //every skin is on the card, so the one the options chose is the one shown
+    return skinSaveState();
+#elif FORCESKIN >= 0
     return FORCESKIN;
 #else
     return skinSaveState();
@@ -88,6 +93,17 @@ uint8_t currentSkin(void)
 void preloadImages(void)
 {
     skinImagesOneBit = ONEBITIMAGES && (currentSkin() == skinBlackWhite);
+#if CARDIMAGES
+    //The pictures of the skin the options chose are read off the card.
+    //The card holds them in the order tools/mkcard.py found the folders - default first, then
+    //the rest by name - which is NOT the order this game numbers them in: its skin 2 is viaduct
+    //and its 3 is sonic, where the card has those two the other way round. Taking one for the
+    //other paired each one's pictures with the other's colours. Named here rather than assumed,
+    //so a skin added to either side cannot quietly do it again
+    static const uint8_t cardSkinOf[maxSkins] =
+        { CARD_SKIN_DEFAULT, CARD_SKIN_BLACKWHITE, CARD_SKIN_VIADUCT, CARD_SKIN_SONIC };
+    CardImages_UseSkin(cardSkinOf[currentSkin() % maxSkins]);
+#endif
     switch(currentSkin())
     {
 #if SKINBUILT(0)
@@ -95,11 +111,20 @@ void preloadImages(void)
         case 0:
             ColorWhite = SCREEN.color565(123,186,255);
 	        ColorBlack = SCREEN.color565(0,65,132);
+#if CARDIMAGES
+            //the same five, from the card, see CardImages_UseSkin above
+            blockTiles = CardImages_Get(CARD_IMG_BLOCKTILES);
+            selectorTiles = CardImages_Get(CARD_IMG_SELECTORTILES);
+            congratsScreenTiles = CardImages_Get(CARD_IMG_CONGRATSTILES);
+            imgTitleScreen = CardImages_Get(CARD_IMG_TITLESCREEN);
+            imgCongratsScreen = CardImages_Get(CARD_IMG_CONGRATSSCREEN);
+#else
             blockTiles = default_blocktiles_data;
             selectorTiles = default_selectortiles_data;
             congratsScreenTiles = default_congratstiles_data;
             imgTitleScreen = default_titlescreen_rle;
             imgCongratsScreen = default_congratsscreen_rle;
+#endif
             setBlockTilesAsBackground();
             break;
 #endif
@@ -108,6 +133,14 @@ void preloadImages(void)
         case 1:
             ColorWhite = SCREEN.color565(255,255,255);
 	        ColorBlack = SCREEN.color565(0,0,0);
+#if CARDIMAGES
+            //the same five, from the card, see CardImages_UseSkin above
+            blockTiles = CardImages_Get(CARD_IMG_BLOCKTILES);
+            selectorTiles = CardImages_Get(CARD_IMG_SELECTORTILES);
+            congratsScreenTiles = CardImages_Get(CARD_IMG_CONGRATSTILES);
+            imgTitleScreen = CardImages_Get(CARD_IMG_TITLESCREEN);
+            imgCongratsScreen = CardImages_Get(CARD_IMG_CONGRATSSCREEN);
+#else
             blockTiles = black_white_blocktiles_data;
             //its own selector tiles rather than the default skin's. Sharing them saved flash while
             //every skin was RGB565, but this skin's are one bit a pixel and come to 10672 bytes
@@ -116,6 +149,7 @@ void preloadImages(void)
             congratsScreenTiles = black_white_congratstiles_data;
             imgTitleScreen = black_white_titlescreen_rle;
             imgCongratsScreen = black_white_congratsscreen_rle;
+#endif
             setBlockTilesAsBackground();
             break;
 #endif
@@ -124,11 +158,20 @@ void preloadImages(void)
         case 2:
             ColorWhite = SCREEN.color565(210,210,210);
 	        ColorBlack = SCREEN.color565(125,125,125);
+#if CARDIMAGES
+            //the same five, from the card, see CardImages_UseSkin above
+            blockTiles = CardImages_Get(CARD_IMG_BLOCKTILES);
+            selectorTiles = CardImages_Get(CARD_IMG_SELECTORTILES);
+            congratsScreenTiles = CardImages_Get(CARD_IMG_CONGRATSTILES);
+            imgTitleScreen = CardImages_Get(CARD_IMG_TITLESCREEN);
+            imgCongratsScreen = CardImages_Get(CARD_IMG_CONGRATSSCREEN);
+#else
             blockTiles = viaduct_blocktiles_data;
             selectorTiles = default_selectortiles_data;
             congratsScreenTiles = viaduct_congratstiles_data;
             imgTitleScreen = viaduct_titlescreen_rle;
             imgCongratsScreen = viaduct_congratsscreen_rle;
+#endif
             setBlockTilesAsBackground();
             break;
 #endif
@@ -137,11 +180,20 @@ void preloadImages(void)
         case 3:
             ColorWhite = SCREEN.color565(204,96,0);
 	        ColorBlack = SCREEN.color565(119,53,0);
+#if CARDIMAGES
+            //the same five, from the card, see CardImages_UseSkin above
+            blockTiles = CardImages_Get(CARD_IMG_BLOCKTILES);
+            selectorTiles = CardImages_Get(CARD_IMG_SELECTORTILES);
+            congratsScreenTiles = CardImages_Get(CARD_IMG_CONGRATSTILES);
+            imgTitleScreen = CardImages_Get(CARD_IMG_TITLESCREEN);
+            imgCongratsScreen = CardImages_Get(CARD_IMG_CONGRATSSCREEN);
+#else
             blockTiles = sonic_blocktiles_data;
             selectorTiles = default_selectortiles_data;
             congratsScreenTiles = sonic_congratstiles_data;
             imgTitleScreen = sonic_titlescreen_rle;
             imgCongratsScreen = sonic_congratsscreen_rle;
+#endif
             setBlockTilesAsBackground();
             break;
 #endif
@@ -291,10 +343,70 @@ static void drawImage(int x, int y, int w, int h, const uint16_t* data, bool tra
 //Every sheet in use belongs to the skin that is running, so which of the two kinds it is follows
 //from the skin. Every skin can be in the build here and picked in the options, so that is a
 //question for run time and not for the build, see skinImagesOneBit
+#if CARDIMAGES
+//A picture from the card: the w by h part at sx,sy of it, at x,y on the screen.
+//This game names a tile by the row of the sheet it starts at, which is what sy is here - a flash
+//build reaches it by adding to the pointer, and there is no pointer to add to on a card
+static void drawImageCardPart(int x, int y, int sx, int sy, int w, int h, const uint8_t* data,
+                              bool transparent)
+{
+    if (!data || (w <= 0) || (h <= 0))
+        return;
+    //into the strip being put together, when there is one. See bandrender.h
+    if (BandRender_Drawing())
+    {
+        BandRender_ImageCard(x, y, sx, sy, w, h, data, transparent);
+        return;
+    }
+    const int c0 = (x < 0) ? -x : 0;
+    const int c1 = (x + w > WINDOW_WIDTH) ? WINDOW_WIDTH - x : w;
+    const int r0 = (y < 0) ? -y : 0;
+    const int r1 = (y + h > WINDOW_HEIGHT) ? WINDOW_HEIGHT - y : h;
+    if ((c0 >= c1) || (r0 >= r1))
+        return;
+    const int cols = c1 - c0;
+    const int dx = x + c0;
+    uint16_t row[WINDOW_WIDTH];
+    //THE BUS RULE: where the card shares the display's bus, reading it takes the bus over, so a
+    //row is fetched with nothing of the display's open and only then sent. See Platform_CardRead
+    for (int r = r0; r < r1; r++)
+    {
+        if (!CardImages_Row(data, sx + c0, sy + r, cols, row))
+            continue;
+        int c = 0;
+        while (c < cols)
+        {
+            if (transparent)
+                while ((c < cols) && (row[c] == TRANSPARENT_COLOR))
+                    c++;
+            const int runX = c;
+            while ((c < cols) && (!transparent || (row[c] != TRANSPARENT_COLOR)))
+                c++;
+            if (c == runX)
+                continue;
+            SCREEN.startWrite();
+  #if LOVYANGFX
+            SCREEN.setAddrWindow(dx + runX, y + r, c - runX, 1);
+            //true: the values are plain RGB565, the library puts them in display order
+            SCREEN.writePixels(row + runX, c - runX, true);
+  #else
+            GFX.pushImage(dx + runX, y + r, c - runX, 1, row + runX);
+  #endif
+            SCREEN.endWrite();
+        }
+    }
+}
+#endif
+
 void drawTile(int x, int y, int w, int h, const uint8_t* sheet, int row, bool transparent)
 {
     if (!sheet)
         return;
+#if CARDIMAGES
+    //the sheet is on the card, so the tile is named by the row it starts at and not by a pointer
+    drawImageCardPart(x, y, 0, row, w, h, sheet, transparent);
+    return;
+#endif
 #if ONEBITIMAGES
     if (skinImagesOneBit)
     {
@@ -335,6 +447,12 @@ static void pushImageRLE(int x, int y, int w, int h, const uint8_t* data)
 {
     if (!data || (w <= 0) || (h <= 0))
         return;
+#if CARDIMAGES
+    //nothing on the card is run length encoded, see tools/mkcard.py: the full screen pictures are
+    //plain ones here and this is the plain draw
+    drawImageCardPart(x, y, 0, 0, w, h, data, false);
+    return;
+#endif
 #if ONEBITIMAGES
     if (skinImagesOneBit)
     {

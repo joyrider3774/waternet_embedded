@@ -7,11 +7,31 @@
 #include "printfuncs.h"
 #include "cursor.h"
 #include "savestate.h"
+//the screen is painted a strip at a time where there is no buffer
+#include "bandrender.h"
+
+//Painted a strip at a time where there is no screen buffer, so the screen is never seen being
+//put together. Only draws, so the band renderer can call it once per strip; see bandrender.h
+static void updateBackgroundGameOnce(void);
 
 void updateBackgroundGame(void)
 {
-    //background
-    GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
+    if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+    {
+        while (BandRender_Next())
+            updateBackgroundGameOnce();
+    }
+    else
+        updateBackgroundGameOnce();
+
+    needRedraw = 0;
+}
+
+static void updateBackgroundGameOnce(void)
+{
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
+        GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
         
     //LEVEL:
     printMessage(0, (maxBoardBgHeight*tileSize/8) +1, "LEVEL:");
@@ -72,8 +92,6 @@ void updateBackgroundGame(void)
 
     if ((!paused) && (!levelDoneBit))
         drawCursors(true);
-    
-    needRedraw = 0;
 }
 
 void initGame(void)

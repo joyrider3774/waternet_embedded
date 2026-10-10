@@ -6,11 +6,32 @@
 #include "printfuncs.h"
 #include "savestate.h"
 #include "level.h"
+//the screen is painted a strip at a time where there is no buffer
+#include "bandrender.h"
 
+
+//Painted a strip at a time where there is no screen buffer, so the screen is never seen being
+//put together. Only draws, so the band renderer can call it once per strip; see bandrender.h
+static void updateBackgroundTitleScreenOnce(void);
 
 void updateBackgroundTitleScreen(void)
 {
-    GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
+#if SCREENBUFFER == 0
+    if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+    {
+        while (BandRender_Next())
+            updateBackgroundTitleScreenOnce();
+        return;
+    }
+#endif
+    updateBackgroundTitleScreenOnce();
+}
+
+static void updateBackgroundTitleScreenOnce(void)
+{
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
+        GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
     set_bkg_tiles(0, 6, titleScreenWidth, titleScreenHeight, imgTitleScreen);
 
     if (titleStep == tsMainMenu)
@@ -308,6 +329,11 @@ void titleScreen(void)
                             skin = 0;
                         setSkinSaveState(skin);
                         preloadImages();
+                        //The skins do not share a background colour, and not every screen
+                        //repaints all of itself: the board is painted over its own rectangle and
+                        //what lies outside it would keep the colour of the skin before. So the
+                        //whole screen is put to the new one here, and then drawn over
+                        GFX.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack);
                         needRedraw = 1;
                         break;
                     }

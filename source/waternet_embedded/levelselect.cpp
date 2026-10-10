@@ -5,10 +5,31 @@
 #include "savestate.h"
 #include "sound.h"
 #include "level.h"
+//the screen is painted a strip at a time where there is no buffer
+#include "bandrender.h"
 
-void updateBackgroundLevelSelect(void) 
+//Painted a strip at a time where there is no screen buffer, so the screen is never seen being
+//put together. Only draws, so the band renderer can call it once per strip; see bandrender.h
+static void updateBackgroundLevelSelectOnce(void);
+
+void updateBackgroundLevelSelect(void)
 {
-    GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
+    if (BandRender_Begin(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, ColorBlack))
+    {
+        while (BandRender_Next())
+            updateBackgroundLevelSelectOnce();
+    }
+    else
+        updateBackgroundLevelSelectOnce();
+
+    needRedraw = 0;
+}
+
+static void updateBackgroundLevelSelectOnce(void)
+{
+    //the strip already starts as this colour, see BandRender_Begin
+    if (!BandRender_Drawing())
+        GFX.fillRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT,ColorBlack);
     //LEVEL:
     printMessage(0, (maxBoardBgHeight*tileSize/8) +1, "LEVEL:");
     
@@ -34,9 +55,12 @@ void updateBackgroundLevelSelect(void)
             printMessage(0, (maxBoardBgHeight*tileSize/8)+2, "OPEN");
         }
     }
-    
+
+    //The board, in the same pass as the text around it. Drawing it afterwards in a pass of its
+    //own would mean this pass painting the plain backdrop over the board first and the board
+    //going back on top of it after, which is the board being seen filling itself in. drawLevel
+    //notices the pass that is open and draws into the strip, see level.cpp
     drawLevel();
-    needRedraw = 0;
 }
 
 void initLevelSelect(void)
