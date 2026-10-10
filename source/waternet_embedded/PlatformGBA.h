@@ -38,6 +38,11 @@
 #error "SCREENBUFFER has to be 0, 1, 8 or 16 on the GBA"
 #endif
 
+//the game draws into the page that is not on the display and that page is shown when the frame
+//is done, so nothing is ever seen half drawn and the strips would only cost work. See
+//PLATFORM_OFFSCREEN_DRAW in Platform.h
+#define PLATFORM_OFFSCREEN_DRAW 1
+
 //The program is read from the cartridge, which the processor waits on, while the internal work RAM
 //it is copied into at the start answers at once. The loops that run once for every pixel are worth
 //the room there, the rest is not: there are 32 KB of it and the variables live in it too. This is

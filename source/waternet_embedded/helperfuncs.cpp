@@ -262,6 +262,14 @@ static void drawImageToBuffer(int x, int y, int w, int h, const uint16_t* data, 
 //that go straight to the display
 static void drawImage(int x, int y, int w, int h, const uint16_t* data, bool transparent)
 {
+#if BANDRENDER
+    //into the strip being put together, when there is one. See bandrender.h
+    if (BandRender_Drawing())
+    {
+        BandRender_Image(x, y, w, h, data, transparent);
+        return;
+    }
+#endif
 #if (SCREENBUFFER == 0) && !LOVYANGFX
     if (transparent)
         GFX.pushImage(x, y, w, h, data, TRANSPARENT_COLOR);
@@ -458,6 +466,16 @@ static void pushImageRLE(int x, int y, int w, int h, const uint8_t* data)
     {
         //the picture carries its own size and is drawn whole
         drawImageOneBitPart(x, y, 0, 0, w, h, data, false);
+        return;
+    }
+#endif
+#if BANDRENDER
+    //into the strip being put together, when there is one. The title screen and the pictures the
+    //intro scrolls come through here, and without this they went to the panel while the strips
+    //were being sent: the screen flickered through the intro and on every menu change
+    if (BandRender_Drawing())
+    {
+        BandRender_ImageRLE(x, y, w, h, data);
         return;
     }
 #endif

@@ -28,14 +28,20 @@
 //whole board each time, and each strip keeps only the part of it that lands there. That works
 //because drawLevel only draws - it reads the game's state and changes none of it.
 //
-//Only built for a card build that draws straight to the display. With a screen buffer the frame
-//is already put together away from the panel and the strips would only cost another pass; and
-//only the card drawing is routed into a strip, so a build whose pictures come out of flash would
-//draw them to the display and have the strips go out over them.
+//Only built where the drawing really reaches the display as it happens. With a screen buffer the
+//frame is already put together away from the panel and the strips would only cost another pass,
+//and so is a frame drawn into a page the display is not showing (PLATFORM_OFFSCREEN_DRAW), which
+//is how the GBA, the DS, the PlayStation and the N64 work.
+//
+//That leaves the CHGame and the Gamebuino META, the two that write to the panel as they draw.
+//It used to be a card build alone, because only the card drawing was routed into a strip and a
+//build whose pictures come out of flash would have drawn them to the display and then had the
+//strips go out over them. Those two paths go into the strip as well now, see BandRender_Image
+//and BandRender_ImageOneBit, so the gate is about the device and no longer about where the art is.
 //
 //Everything here still stands where it is not built: Begin gives false and Drawing gives false,
 //so a screen that paints itself the way above paints itself the plain way instead.
-#if (SCREENBUFFER == 0) && CARDIMAGES
+#if (SCREENBUFFER == 0) && !PLATFORM_OFFSCREEN_DRAW
 #define BANDRENDER 1
 #else
 #define BANDRENDER 0
@@ -65,5 +71,17 @@ bool BandRender_Drawing(void);
 void BandRender_ImageCard(int x, int y, int sx, int sy, int w, int h, const uint8_t* data,
                           bool transparent);
 #endif
+//A w by h picture out of flash at x,y, the pixels laid out as w of them a row. The same picture
+//and the same arguments the display path takes, so that drawImage can hand its work straight over
+void BandRender_Image(int x, int y, int w, int h, const uint16_t* data, bool transparent);
+#if ONEBITIMAGES
+//the same for a picture kept one bit a pixel, which carries its own size, see onebitimage.h
+void BandRender_ImageOneBit(int x, int y, int sx, int sy, int w, int h, const uint8_t* data,
+                            bool transparent);
+#endif
+//And for a run length encoded one, the format tools/png2rle565.py writes: the whole w by h
+//picture at x,y, which is what pushImageRLE draws. The title screen and the pictures the intro
+//scrolls are these
+void BandRender_ImageRLE(int x, int y, int w, int h, const uint8_t* data);
 
 #endif

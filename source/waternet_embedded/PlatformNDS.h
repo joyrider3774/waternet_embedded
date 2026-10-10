@@ -33,6 +33,10 @@
 #error "SCREENBUFFER has to be 0, 1, 8 or 16 on the DS"
 #endif
 
+//the frame is drawn away from the display and shown when it is done, so nothing is ever seen
+//half drawn and the strips would only cost work. See PLATFORM_OFFSCREEN_DRAW in Platform.h
+#define PLATFORM_OFFSCREEN_DRAW 1
+
 //1 = the frame is scaled to 192x192 by the DS's background scaling, as high as the display, in its
 //middle. 0 = it is shown 1:1 in the middle. A build can still set it itself
 #ifndef SCALESCREEN

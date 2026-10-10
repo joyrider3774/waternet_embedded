@@ -2,6 +2,8 @@
 
 #include <string.h>
 #include "onebitimage.h"
+//a one bit picture goes into the strip being put together, when there is one
+#include "bandrender.h"
 
 //The frame report's counters, see CHGAME_TIMING in Platform.h. They are not the one bit
 //drawing's own: a card build has no one bit pictures and still reports where a frame went
@@ -143,6 +145,14 @@ PLATFORM_FAST_CODE PLATFORM_HOT_CODE void drawImageOneBitPart(int x, int y, int 
 {
     if (!data || (w <= 0) || (h <= 0))
         return;
+#if BANDRENDER
+    //into the strip being put together, when there is one. See bandrender.h
+    if (BandRender_Drawing())
+    {
+        BandRender_ImageOneBit(x, y, sx, sy, w, h, data, transparent);
+        return;
+    }
+#endif
     const int dataWidth = OneBitWidth(data);
     const int dataHeight = OneBitHeight(data);
     const int maskAt = OneBitMaskAt(data);
