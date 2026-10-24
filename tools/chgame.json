@@ -1,0 +1,12 @@
+{
+  "id": "waternet",
+  "title": "WATERNET",
+  "author": "Willems Davy",
+  "version": "1.0",
+  "description": "A Port of my waternet game",
+  "genre": "Puzzle",
+  "license": "MIT",
+  "url": "https://github.com/joyrider3774/waternet_embedded",
+  "sourceUrl": "https://github.com/joyrider3774/waternet_embedded",
+  "sdcard": "sdcard"
+}
